@@ -1,3 +1,27 @@
+Revision 9912 - 05.10.2017
+- APS/DVS: changed orientation to upper left corner (computer
+  graphics format), was lower left corner before (OpenGL format).
+- APS: separated state machine for external ADC from internal
+  ADC one, now called 'APSADCStateMachineExternal'.
+- APS: added ROI0Enabled configuration parameter, now only sends
+  ROI information if ROI region 0 is enabled.
+- APS: doubled maximum values of ResetTime and RowSettleTime.
+- APS: in global shutter mode, don't do RESET_A on each column
+  reset read, just do it once at the end of all reset reads.
+  This improves image quality without any dark shadows side-effect.
+- Multiplexer: more robust timestamp handling regarding wrap/reset.
+- FX2: the EarlyPacketDelay is now specified in cycles @ LogicClock.
+- LED: changed mapping of camera LEDs:
+    - LED0 -> on if camera is master
+    - LED1 -> on if not transmitting data (ready to transmit)
+    - LED2 -> on if camera is being configured
+- SPIConfig: reduced register usage.
+- FIFO: properly use read-side reset to reset read-side registers.
+- Counters: simplified counter design.
+- BufferClear: simpler, more robust design.
+- ClockDomainGenerator: synchronize lock-reset.
+- EdgeDetector: reduced register usage.
+
 Revision 9880 - 21.05.2017
 - Added EXTERNAL_ADC_BUS_WIDTH to Settings.
 - Updated to Lattice Diamond 3.9.
