@@ -65,6 +65,8 @@ int main(void) {
 		xputs("Error initializing the MPL!\nNo calibrated or fused data\n");
 	}
 #endif
+
+
 #if USE_SDCARD
 	SDCardInit();
 #endif
@@ -76,6 +78,8 @@ int main(void) {
 	test();
 	//This will not return
 #endif
+
+	xputs("OK!\n");
 
 	for (;;) {
 		if (ledBlinking && toggleLed0) {

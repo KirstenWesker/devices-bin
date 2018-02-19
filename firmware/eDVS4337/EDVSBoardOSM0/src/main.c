@@ -20,6 +20,11 @@ __NOINIT(RAM4) volatile struct eventRingBuffer events;
 __NOINIT(RAM5) volatile struct uart_hal uart;
 __NOINIT(RAM6) volatile uint32_t __core_m0_has_started__;
 
+
+//#define CHECK_RTS_SIGNAL() { if (Chip_GPIO_ReadPortBit(LPC_GPIO_PORT, CTS0_GPIO_PORT, CTS0_GPIO_PIN) != 0) { LPC_UART->TER2 = 0; } }			// disable/enable sending data
+#define CHECK_RTS_SIGNAL() { LPC_UART->TER2 = (Chip_GPIO_ReadPortBit(LPC_GPIO_PORT, CTS0_GPIO_PORT, CTS0_GPIO_PIN)) ? 0 : 1; }
+
+
 #define TIMER_EXT_MATCH_2_SET		(1<<2)
 __RAMFUNC(RAM) int main(void) {
 	//The M4 core is in a tight loop waiting for the variable to be set to 1.
@@ -27,8 +32,12 @@ __RAMFUNC(RAM) int main(void) {
 	uint32_t DVSEventPointer;
 	uint32_t DVSEventTime, DVSEventTimeOld;
 	uint16_t DVSEvent;
-	DVSEventTime = DVSEventTimeOld = Chip_TIMER_ReadCapture(LPC_TIMER1, TIMER_CAPTURE_CHANNEL);
+	DVSEventTimeOld = Chip_TIMER_ReadCapture(LPC_TIMER1, TIMER_CAPTURE_CHANNEL);
+
 	while (1) {
+
+		CHECK_RTS_SIGNAL();			// possibly start/stop data transmission
+
 		//Chip_GPIO_SetPinToggle(LPC_GPIO_PORT, 0, 1); //Only for checking quickly this loops speed
 		/**
 		 * An event is fetched by comparing the captured timestamp from the timer
@@ -41,9 +50,11 @@ __RAMFUNC(RAM) int main(void) {
 			events.currentEventRate++;
 			DVSEventPointer = ((events.eventBufferWritePointer + 1) & DVS_EVENTBUFFER_MASK);
 			int32_t freeSpace = (events.eventBufferReadPointer - DVSEventPointer) & DVS_EVENTBUFFER_MASK;
+			CHECK_RTS_SIGNAL();			// possibly start/stop data transmission
 			if (freeSpace < 4) {
 				while (events.ringBufferLock) {
-					__NOP(); //Wait for the M4 to finish with the queue
+//					__NOP(); //Wait for the M4 to finish with the queue
+					CHECK_RTS_SIGNAL();			// possibly start/stop data transmission
 				}
 				events.eventBufferReadPointer = ((events.eventBufferReadPointer + 1) & DVS_EVENTBUFFER_MASK);
 			}
@@ -56,29 +67,27 @@ __RAMFUNC(RAM) int main(void) {
 		 * UART1 should handle CTs and RTS in hardware
 		 * TODO: this is an open issue
 		 */
-#if UART_PORT_DEFAULT == 0
-		if (Chip_GPIO_ReadPortBit(LPC_GPIO_PORT, CTS0_GPIO_PORT, CTS0_GPIO_PIN) == 0
-				&& (LPC_UART->LSR & UART_LSR_THRE)) { // no rts stop signal
-#endif
-			int i = 15; //Use the TX FIFO
-			while (bytesToSend(&uart) && i) {
-				LPC_UART->THR = popByteFromTransmissionBuffer(&uart);
-				--i;
-			}
+
+		CHECK_RTS_SIGNAL();			// possibly start/stop data transmission
+
+		while ((bytesToSend(&uart)) && (LPC_UART->LSR & UART_LSR_THRE) ) { // copy as many chars as possible into FIFO (i.e. chars available and space in fifo)
+			LPC_UART->THR = popByteFromTransmissionBuffer(&uart);
+		}
+
+		CHECK_RTS_SIGNAL();			// possibly start/stop data transmission
+
+
 #if LOW_POWER_MODE
-			if (!byteToSend(&uart) && M4Sleeping(&uart)) { // signal M4 TX is done
-				uart.txSleepingFlag = 0;
-				/**
-				 * Initiate interrupt on other processor
-				 * Upon calling this function generates and interrupt on the other
-				 * core. Ex. if called from M0 core it generates interrupt on M4 core
-				 * and vice versa.
-				 */
-				__DSB();
-				__SEV();
-			}
-#endif
-#if UART_PORT_DEFAULT == 0
+		if (!byteToSend(&uart) && M4Sleeping(&uart)) { // signal M4 TX is done
+			uart.txSleepingFlag = 0;
+			/**
+			 * Initiate interrupt on other processor
+			 * Upon calling this function generates and interrupt on the other
+			 * core. Ex. if called from M0 core it generates interrupt on M4 core
+			 * and vice versa.
+			 */
+			__DSB();
+			__SEV();
 		}
 #endif
 
@@ -96,6 +105,9 @@ __RAMFUNC(RAM) int main(void) {
 				}
 			}
 		}
+
+		CHECK_RTS_SIGNAL();			// possibly start/stop data transmission
+
 		/**
 		 * This is a work around for the hardware limitations
 		 * of the timer in the LPc4337.
@@ -109,11 +121,15 @@ __RAMFUNC(RAM) int main(void) {
 			LPC_TIMER0->EMR = (((uint32_t) 9) << 0) | (((uint32_t) TIMER_EXTMATCH_CLEAR) << 4)
 					| (((uint32_t) TIMER_EXTMATCH_SET) << 8) | (((uint32_t) TIMER_EXTMATCH_CLEAR) << 10);
 		}
+
 		if ( LPC_TIMER2->EMR & TIMER_EXT_MATCH_2_SET) {
 			//The timer2 is using channels 0 and 1 for the outputs.
 			LPC_TIMER2->EMR = (((uint32_t) 3) << 0) | (((uint32_t) TIMER_EXTMATCH_CLEAR) << 4)
 					| (((uint32_t) TIMER_EXTMATCH_CLEAR) << 6) | (((uint32_t) TIMER_EXTMATCH_SET) << 8);
 		}
+
+		CHECK_RTS_SIGNAL();			// possibly start/stop data transmission
+
 		if ( LPC_TIMER3->EMR & TIMER_EXT_MATCH_2_SET) {
 			//The timer3 is using channels 0 and 1 for the outputs.
 			LPC_TIMER3->EMR = (((uint32_t) 3) << 0) | (((uint32_t) TIMER_EXTMATCH_CLEAR) << 4)

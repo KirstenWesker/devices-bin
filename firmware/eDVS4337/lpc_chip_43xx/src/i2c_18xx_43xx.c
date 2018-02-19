@@ -354,12 +354,12 @@ void Chip_I2C_EventHandlerPolling(I2C_ID_T id, I2C_EVENT_T event)
 	}
 
 	stat = &iic->mXfer->status;
-	uint32_t timeout = TIMEOUT * iic->mXfer->txSz;
+	uint32_t timeout = TIMEOUT + TIMEOUT * iic->mXfer->txSz;						// use minimal timeout even for zero-byte transfer
 	/* Call the state change handler till xfer is done */
 	while (*stat == I2C_STATUS_BUSY) {
 		if (Chip_I2C_IsStateChanged(id)) {
 			Chip_I2C_MasterStateHandler(id);
-			timeout = TIMEOUT * iic->mXfer->txSz;
+			timeout = TIMEOUT + TIMEOUT * iic->mXfer->txSz;						// use minimal timeout even for zero-byte transfer
 		} else {
 			if (timeout-- == 0) {
 				break;
@@ -433,7 +433,7 @@ int Chip_I2C_MasterTransfer(I2C_ID_T id, I2C_XFER_T *xfer)
 	}
 	iic->mEvent(id, I2C_EVENT_WAIT);
 	iic->mXfer = 0;
-	uint32_t timeout = TIMEOUT * xfer->txSz;
+	uint32_t timeout = TIMEOUT + TIMEOUT * xfer->txSz;						// use minimal timeout even for zero-byte transfer
 	/* Wait for stop condition to appear on bus */
 	while (!isI2CBusFree(iic->ip)) {
 		if (timeout-- == 0) {
@@ -457,7 +457,7 @@ int Chip_I2C_MasterSend(I2C_ID_T id, uint8_t slaveAddr, const uint8_t *buff, uin
 	xfer.slaveAddr = slaveAddr;
 	xfer.txBuff = buff;
 	xfer.txSz = len;
-	uint32_t timeout = TIMEOUT * len;
+	uint32_t timeout = TIMEOUT + TIMEOUT * len;								// use minimal timeout even for zero-byte transfer
 	while (Chip_I2C_MasterTransfer(id, &xfer) == I2C_STATUS_ARBLOST) {
 		if (timeout-- == 0) {
 			break;
@@ -477,7 +477,7 @@ int Chip_I2C_MasterCmdRead(I2C_ID_T id, uint8_t slaveAddr, uint8_t cmd, uint8_t 
 	xfer.txSz = 1;
 	xfer.rxBuff = buff;
 	xfer.rxSz = len;
-	uint32_t timeout = TIMEOUT * len;
+	uint32_t timeout = TIMEOUT + TIMEOUT * len;								// use minimal timeout even for zero-byte transfer
 	while (Chip_I2C_MasterTransfer(id, &xfer) == I2C_STATUS_ARBLOST) {
 		if (timeout-- == 0) {
 			break;
@@ -493,7 +493,7 @@ int Chip_I2C_MasterRead(I2C_ID_T id, uint8_t slaveAddr, uint8_t *buff, int len)
 	xfer.slaveAddr = slaveAddr;
 	xfer.rxBuff = buff;
 	xfer.rxSz = len;
-	uint32_t timeout = TIMEOUT * len;
+	uint32_t timeout = TIMEOUT + TIMEOUT * len;								// use minimal timeout even for zero-byte transfer
 	while (Chip_I2C_MasterTransfer(id, &xfer) == I2C_STATUS_ARBLOST) {
 		if (timeout-- == 0) {
 			break;

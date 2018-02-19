@@ -30,7 +30,7 @@
  * Enable/Disable the SD card support.
  * SD card requires quite a bit of power (~9mA) so it is disable by default
  */
-#define USE_SDCARD						1
+#define USE_SDCARD						0
 
 /**
  * Enable/Disable low power mode
@@ -51,10 +51,12 @@
  * It can be changed afterwards through a UART command.
  */
 #define BAUD_RATE_DEFAULT		(4000000)
+//#define BAUD_RATE_DEFAULT		(6000000)
+//#define BAUD_RATE_DEFAULT		(12000000)
 
 /**
  * Current Software versions
  */
-#define SOFTWARE_VERSION		"0.7.1"
+#define SOFTWARE_VERSION		"0.8.0"
 
 #endif /* CONFIG_H_ */
