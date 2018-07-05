@@ -1,18 +1,17 @@
-# iniLabs devices-bin
-Firmware, logic and driver binaries for supported iniLabs devices, neuromorphic vision sensors, neuromorphic audio sensors, and neuromorphic processors.
+# iniVation devices-bin
+
+Firmware, logic and driver binaries for supported iniVation devices.
 
 Supported devices include:
 * DVS128
 * eDVS
 * mini-eDVS
 * DAVIS240A/B/C
-* Davis346
-* Davis128 (IOT)
-* DAS1
-* Dynap-se
-* USB3 development-kit (DAVIS)
+* DAVIS346
+* DAVIS USB3 development-kits
 
 # Documentation
-Hardware documentation: https://inilabs.com/support/hardware/
 
-Using Flashy to update devices: https://inilabs.com/support/software/reflashing/
+Hardware documentation: https://inivation.com/support/hardware/
+
+Using Flashy to update devices: https://inivation.com/support/software/reflashing/
