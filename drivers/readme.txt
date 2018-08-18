@@ -23,7 +23,7 @@ The current assignements are as follows for the PIDs:
 0x840E Silicon Eye Rhino 1.0 (Insightness, added by Tobi on 21.06.2016)
 0x840F 
 
-0x8410 
+0x8410 AerSequencer
 0x8411 DVS128_PAER
 0x8412 
 0x8413 
