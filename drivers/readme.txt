@@ -7,7 +7,7 @@ The Thesycon VID=0x152a and the range of PIDs from 0x8400 to 0x841F, a total of 
 The current assignements are as follows for the PIDs:
 
 0x8400 DVS128
-0x8401 DVS320
+0x8401 
 0x8402  
 0x8403 
 0x8404 
@@ -16,14 +16,14 @@ The current assignements are as follows for the PIDs:
 0x8407 
 0x8408 
 0x8409 
-0x840A cDVSTest
-0x840B SeeBetter
-0x840C SeeBetter20
-0x840D SBret10
-0x840E Silicon Eye Rhino 1.0 (Insightness, Tobi on 21.06.2016)
+0x840A 
+0x840B 
+0x840C 
+0x840D 
+0x840E Silicon Eye Rhino 1.0 (Insightness, added by Tobi on 21.06.2016)
 0x840F 
 
-0x8410 SimpleAESequencer
+0x8410 
 0x8411 DVS128_PAER
 0x8412 
 0x8413 
@@ -32,10 +32,10 @@ The current assignements are as follows for the PIDs:
 0x8416 
 0x8417 
 0x8418 
-0x8419 Retina Teresa (provisorial)
-0x841A DAViS FX3 boards, SeeBetterLogic
-0x841B DAViS FX2 boards, SeeBetterLogic
-0x841C DVS128 FX2 boards, SeeBetterLogic
-0x841D 
-0x841E 
-0x841F 
+0x8419 
+0x841A DAVIS FX3 boards (DID mb=1, blue=2, red=3)
+0x841B DAVIS FX2, 240A/B/C
+0x841C Cochlea FX3
+0x841D Dynap-SE FX2
+0x841E DVS132S
+0x841F Test and Debug devices
