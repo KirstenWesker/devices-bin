@@ -37,5 +37,5 @@ The current assignements are as follows for the PIDs:
 0x841B DAVIS FX2, 240A/B/C
 0x841C Cochlea FX3
 0x841D Dynap-SE FX2
-0x841E DVS132S
+0x841E DVSExperimental FX3
 0x841F Test and Debug devices
